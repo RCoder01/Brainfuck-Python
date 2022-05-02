@@ -86,7 +86,7 @@ class BrainfuckInstance:
                 self.input()
             case None:
                 pass
-            case int as x:
+            case int() as x:
                 if x > self.instruction_pointer:
                     self.loop_start()
                 else:
@@ -104,7 +104,7 @@ class BrainfuckInstance:
 
 def main():
     import sys
-    BrainfuckInstance(sys.argv[1])
+    BrainfuckInstance(sys.argv[1]).run()
 
 
 if __name__ == '__main__':

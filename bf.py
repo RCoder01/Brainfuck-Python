@@ -16,7 +16,7 @@ class BrainfuckInstance:
                 loop_stack.append(len(instructions) - 1)
             elif i == ']':
                 if not loop_stack:
-                    raise
+                    raise InvalidLoopError('Attempted to close unknown loop')
                 instructions.append(loop_stack.pop())
                 instructions[instructions[-1]] = len(instructions) - 1
             else:

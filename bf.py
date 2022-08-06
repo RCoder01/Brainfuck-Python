@@ -108,7 +108,16 @@ class BrainfuckInstance:
 
 def main():
     import sys
-    BrainfuckInstance(sys.argv[1]).run()
+
+    if len(sys.argv) > 2 and (sys.argv[1] == '-f' or sys.argv[1] == '--file'):
+        with open(sys.argv[2], 'r') as f:
+            code = f.read()
+    else:
+        code = ''.join(sys.argv[1:])
+    
+    inst = BrainfuckInstance(code)
+    inst.run()
+
 
 
 if __name__ == '__main__':

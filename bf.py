@@ -108,16 +108,28 @@ class BrainfuckInstance:
 
 def main():
     import sys
+    if '-d' in sys.argv[:-1]:
+        sys.argv.remove('-d')
+        debug = True
+    elif '--debug' in sys.argv[:-1]:
+        sys.argv.remove('--debug')
+        debug = True
+    else:
+        debug = False
 
     if len(sys.argv) > 2 and (sys.argv[1] == '-f' or sys.argv[1] == '--file'):
         with open(sys.argv[2], 'r') as f:
             code = f.read()
     else:
         code = ''.join(sys.argv[1:])
+        if not code:
+            print('Usage: bf.py [-d/--debug] [-f/--file <file>] <code>')
     
     inst = BrainfuckInstance(code)
     inst.run()
 
+    if debug:
+        print(inst)
 
 
 if __name__ == '__main__':

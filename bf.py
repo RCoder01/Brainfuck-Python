@@ -50,9 +50,13 @@ class BrainfuckInstance:
 
     def increment(self):
         self.memory[self.memory_pointer] += 1
+        if self.memory[self.memory_pointer] > 255:
+            self.memory[self.memory_pointer] = 0
 
     def decrement(self):
         self.memory[self.memory_pointer] -= 1
+        if self.memory[self.memory_pointer] < 0:
+            self.memory[self.memory_pointer] = 255
 
     def output(self):
         print(chr(self.memory[self.memory_pointer]), end='')

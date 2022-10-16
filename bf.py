@@ -1,4 +1,7 @@
 
+from typing import Optional
+
+
 class InvalidLoopError(BaseException):
     pass
 
@@ -106,6 +109,15 @@ class BrainfuckInstance:
     def __repr__(self) -> str:
         return f'BrainuckInstance<memory={self.memory} memory_pointer={self.memory_pointer} instructions={self.instructions} instruction_pointer={self.instruction_pointer}>'
 
+def get_arg(args: list[str], arg_name: str) -> Optional[str]:
+    if arg_name in args:
+        loc = args.index(arg_name)
+        args.remove(arg_name)
+        input = args[loc]
+        args.remove(args[loc])
+        return input
+    return None
+
 def main():
     import sys
     if '-d' in sys.argv[:-1]:
@@ -117,14 +129,20 @@ def main():
     else:
         debug = False
 
-    if len(sys.argv) > 2 and (sys.argv[1] == '-f' or sys.argv[1] == '--file'):
-        with open(sys.argv[2], 'r') as f:
+    code = None
+    args = sys.argv.copy()
+    if (fname := get_arg(args, '-f')) is not None:
+        with open(fname) as f:
             code = f.read()
-    else:
+    elif (fname := get_arg(args, '-f')) is not None:
+        with open(fname) as f:
+            code = f.read()
+
+    if code is None:
         code = ''.join(sys.argv[1:])
         if not code:
             print('Usage: bf.py [-d/--debug] [-f/--file <file>] <code>')
-    
+
     inst = BrainfuckInstance(code)
     inst.run()
 

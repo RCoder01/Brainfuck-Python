@@ -29,13 +29,14 @@ class BrainfuckInstance:
         instructions.append(None)
         return instructions
 
-    def __init__(self, code: str):
+    def __init__(self, code: str, input: str = None, ofname: str = None):
         self.instructions = self.decode_instruction_string(code)
         self.memory = []
         self.memory_pointer = 0
         self.instruction_pointer = 0
-        self._input_buffer = ''
-    
+        self._ofname = ofname
+        self._input_buffer = input or ''
+
     def ensure_memory_pointer(self):
         if self.memory_pointer >= len(self.memory):
             self.memory.append(0)
@@ -63,7 +64,11 @@ class BrainfuckInstance:
             self.memory[self.memory_pointer] = 255
 
     def output(self):
-        print(chr(self.memory[self.memory_pointer]), end='')
+        ch = chr(self.memory[self.memory_pointer])
+        if self._ofname:
+            self._of.write(ch)
+        else:
+            print(ch, end='')
 
     def _input(self) -> int:
         while not self._input_buffer:
@@ -108,10 +113,15 @@ class BrainfuckInstance:
         self.instruction_pointer += 1
 
     def run(self):
+        self._of = open(self._ofname, 'w') if self._ofname else None
+
         while self.instructions[self.instruction_pointer] is not None:
             if self.instruction_pointer < 0:
                 raise IndexError('Instruction pointer is out of bounds')
             self.advance()
+
+        if self._ofname:
+            self._of.close()
 
     def __repr__(self) -> str:
         return f'BrainuckInstance<memory={self.memory} memory_pointer={self.memory_pointer} instructions={self.instructions} instruction_pointer={self.instruction_pointer}>'
@@ -137,6 +147,8 @@ def main():
         debug = False
 
     code = None
+    input = None
+    ofname = None
     args = sys.argv.copy()
     if (fname := get_arg(args, '-f')) is not None:
         with open(fname) as f:
@@ -144,13 +156,24 @@ def main():
     elif (fname := get_arg(args, '-f')) is not None:
         with open(fname) as f:
             code = f.read()
+    if (fname := get_arg(args, '-i')) is not None:
+        with open(fname) as f:
+            input = f.read()
+    elif (fname := get_arg(args, '--input')) is not None:
+        with open(fname) as f:
+            input = f.read()
+            code = f.read()
+    if (fname := get_arg(args, '-o')) is not None:
+        ofname = fname
+    elif (fname := get_arg(args, '--output')) is not None:
+        ofname = fname
 
     if code is None:
         code = ''.join(sys.argv[1:])
         if not code:
-            print('Usage: bf.py [-d/--debug] [-f/--file <file>] <code>')
+            print('Usage: bf.py [-d/--debug] [-f/--file <file>] [-i/--input <file>] [-o/--output <file>] <code>')
 
-    inst = BrainfuckInstance(code)
+    inst = BrainfuckInstance(code, input, ofname)
     inst.run()
 
     if debug:

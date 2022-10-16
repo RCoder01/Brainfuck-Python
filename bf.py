@@ -31,6 +31,7 @@ class BrainfuckInstance:
         self.memory = []
         self.memory_pointer = 0
         self.instruction_pointer = 0
+        self._input_buffer = ''
     
     def ensure_memory_pointer(self):
         if self.memory_pointer >= len(self.memory):
@@ -61,8 +62,14 @@ class BrainfuckInstance:
     def output(self):
         print(chr(self.memory[self.memory_pointer]), end='')
 
+    def _input(self) -> int:
+        while not self._input_buffer:
+            self._input_buffer = input()
+        out, self._input_buffer = self._input_buffer[0], self._input_buffer[1:]
+        return ord(out)
+
     def input(self):
-        self.memory[self.memory_pointer] = ord(input())
+        self.memory[self.memory_pointer] = self._input()
 
     def loop_start(self):
         if self.memory[self.memory_pointer] == 0:
